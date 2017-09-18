@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.bzrg.mapper.UserMapper">
+	
+	<!-- 新增用户 -->
+	<insert id="addUser">
+		INSERT INTO USER(user_id,user_name,PASSWORD) VALUES (#{userId},#{userName},#{password})
+	</insert>
+	
+	<!-- 添加用户订单表 -->
+	<insert id="saveUserOrder">
+	    insert into user_order (user_id,order_id) values(#{userId},#{orderId})
+	</insert>
+</mapper>

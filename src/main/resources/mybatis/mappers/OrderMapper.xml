@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.bzrg.mapper.OrderMapper">
+	<!-- 添加订单 -->
+	<insert id="saveOrderItem">
+		insert into order_item
+		(order_id,house_id,total_price,day_number,startTime,endTime)
+		values
+		(#{orderId},#{house.houseId},#{totalPrice},#{dayNumber},#{house.startTime},#{house.endTime})
+	</insert>
+
+	<!-- 根据订单id修改房屋信息 -->
+	<update id="updateHouseState">
+		update house set state = #{state} where house_id = (
+		select house_id from house_order where order_id = #{orderId}
+		)
+	</update>
+
+	<!-- 根据用户id查询订单信息 -->
+	<select id="findOrderItemByUserId" resultMap="orderItemRM">
+		SELECT * FROM
+		(SELECT oi.order_id,oi.house_id
+		h_id,oi.total_price,oi.startTime,oi.endTime,oi.day_number
+		FROM
+		(SELECT order_id from user_order where user_id = '${userId}') o
+		LEFT JOIN
+		order_item oi
+		ON o.order_id=oi.order_id) p
+		LEFT JOIN
+		house h
+		ON p.h_id = h.house_id
+		where h.state!='1'
+	</select>
+	
+	<!-- 封住订单数据 -->
+	<resultMap type="OrderItem" id="orderItemRM" autoMapping="true">
+	    <id column="order_id" property="orderId"/>
+	    <association property="house" javaType="House" autoMapping="true">
+	        <id column="house_id" property="houseId"/>
+	    </association>
+	</resultMap>
+</mapper>

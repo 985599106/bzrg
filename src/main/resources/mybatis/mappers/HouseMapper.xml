@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.tedu.bzrg.mapper.HouseMapper">
+	<!-- 根据条件查询房子 -->
+	<select id="findHouse" resultType="House">
+		select * from
+		house
+		<where>
+			<if test="city != ''">
+				city like CONCAT(CONCAT('%',#{city}),'%')
+			</if>
+			<if test="startTime != null">
+				and endTime <![CDATA[<]]>
+				#{startTime}
+			</if>
+			<if test="houseType != ''">
+				and house_type = #{houseType}
+			</if>
+		</where>
+	</select>
+	<!-- 封装数据 -->
+	<resultMap type="House" id="houseRM" autoMapping="true">
+		<id column="house_id" property="houseId" />
+		<association property="userInfo" javaType="UserInfo" autoMapping="true">
+		    <id column="hu_id" property="userId"/>
+		</association>
+	</resultMap>
+
+	<!-- 根据房子id查询房子信息 -->
+	<select id="findHouseById" resultMap="houseRM">
+		SELECT * from
+		(select h.*,hu.user_id hu_id FROM
+		(select * from house where house_id =${houseId}) h
+		LEFT JOIN
+		house_user hu
+		ON h.house_id = hu.house_id) p
+		LEFT JOIN
+		user_info ui
+		on p.hu_id = ui.user_id
+	</select>
+	
+	<!-- 添加房屋订单表 -->
+	<insert id="saveHouseOrder">
+	    insert into house_order (order_id,house_id) values(#{orderId},#{houseId})
+	</insert>
+	
+	<!-- 查找所有的房屋信息 -->
+	<select id="findAllHouse" resultType="House">
+	    select * from house;
+	</select>
+</mapper>
